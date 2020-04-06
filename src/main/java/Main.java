@@ -6,26 +6,17 @@ import java.util.zip.GZIPInputStream;
 
 public class Main {
     public static void main(String[] args) {
-        Properties properties = new Properties();
-        File file = new File(Main.class.getResource(properties.getProperty("file")).getFile());
-        byte[] buffer = new byte[1024];
-        int signal;
-        String decodedString = "";
         try {
+            File file = new File(Main.class.getResource("file.txt.gz").getFile());
             InputStream fileInputStream = new FileInputStream(file);
             GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
             Base64InputStream base64InputStream = new Base64InputStream(gzipInputStream);
-            signal = base64InputStream.read(buffer);
-            while (signal != -1) {
-                decodedString += new String(buffer);
-                signal = base64InputStream.read(buffer);
-            }
-            gzipInputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            InputStreamReader inputStreamReader = new InputStreamReader(base64InputStream);
+            FileOutputStream fileOutputStream = new FileOutputStream("output.xml");
+            fileOutputStream.write(inputStreamReader.readStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(decodedString);
     }
+
 }
