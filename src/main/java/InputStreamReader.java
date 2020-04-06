@@ -1,3 +1,5 @@
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,16 +16,11 @@ public class InputStreamReader {
      * Uses ByteArrayOutputStream to construct byte array which will be returned
      */
     public byte[] readStream() {
-        byte[] buffer = new byte[1024];
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int bytesRead;
         try {
-            bytesRead = inputStream.read(buffer);
-            while (bytesRead != -1) {
-                baos.write(buffer);
-                bytesRead = inputStream.read(buffer);
-            }
+            IOUtils.copy(inputStream, baos);
             inputStream.close();
+            baos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
