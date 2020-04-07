@@ -6,30 +6,37 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
 public class Main {
+    static final String configFile = "conf.properties";
+
     public static void main(String[] args) {
         try {
-            writeOutput();
+            start();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private static Properties readProperties() throws IOException {
+    private static Properties readProperties(String propertiesFile) throws IOException {
         PropertiesReader propertiesReader = new PropertiesReader();
-        return propertiesReader.read("conf.properties");
+        return propertiesReader.read(propertiesFile);
     }
 
-    private static InputStream createInputStreamPath(Properties properties) throws IOException {
-        File file = new File(Main.class.getResource(properties.getProperty("inputFile")).getFile());
+    private static InputStream createInputStreamPath(String propertiesFile) throws IOException {
+        Properties properties = readProperties(propertiesFile);
+        File file = new File(properties.getProperty("inputFile"));
         FileInputStream fileInputStream = new FileInputStream(file);
         GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
         return new Base64InputStream(gzipInputStream);
     }
 
-    private static void writeOutput() throws IOException {
-        Properties properties = readProperties();
-        InputStream inputStream = createInputStreamPath(properties);
+    private static void writeOutput(String propertiesFile, InputStream inputStream) throws IOException {
+        Properties properties = readProperties(propertiesFile);
         FileOutputStream fileOutputStream = new FileOutputStream(properties.getProperty("outputFile"));
         IOUtils.copy(inputStream, fileOutputStream);
+    }
+
+    private static void start() throws IOException {
+        InputStream inputStream = createInputStreamPath(configFile);
+        writeOutput(configFile, inputStream);
     }
 }
