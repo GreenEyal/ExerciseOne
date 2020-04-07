@@ -1,4 +1,5 @@
 import org.apache.commons.codec.binary.Base64InputStream;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.Properties;
@@ -18,18 +19,17 @@ public class Main {
         return propertiesReader.read("conf.properties");
     }
 
-    private static InputStreamReader createInputStreamPath(Properties properties) throws IOException {
+    private static InputStream createInputStreamPath(Properties properties) throws IOException {
         File file = new File(Main.class.getResource(properties.getProperty("inputFile")).getFile());
         FileInputStream fileInputStream = new FileInputStream(file);
         GZIPInputStream gzipInputStream = new GZIPInputStream(fileInputStream);
-        Base64InputStream base64InputStream = new Base64InputStream(gzipInputStream);
-        return new InputStreamReader(base64InputStream);
+        return new Base64InputStream(gzipInputStream);
     }
 
     private static void writeOutput() throws IOException {
         Properties properties = readProperties();
-        InputStreamReader inputStreamReader = createInputStreamPath(properties);
+        InputStream inputStream = createInputStreamPath(properties);
         FileOutputStream fileOutputStream = new FileOutputStream(properties.getProperty("outputFile"));
-        fileOutputStream.write(inputStreamReader.readStream());
+        IOUtils.copy(inputStream, fileOutputStream);
     }
 }
